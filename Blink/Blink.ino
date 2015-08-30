@@ -22,7 +22,7 @@ int j;
 // But can't just do the simple blinking bit...  Sort of count down now
 
 void loop() {
-  for (j=1000;j>0;j-=100) {
+  for (j=200;j>0;j-=10) {
     digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(j);               // wait for a j/1000th of a second
     digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW

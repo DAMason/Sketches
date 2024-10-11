@@ -5,8 +5,8 @@
   This example code is in the public domain.
  */
  
-// Pin 13 has an LED connected on most Arduino boards.
-// give it a name:
+// Arduino Leonardo doesn't have the standard pin 13 LED, so picking a pin to connect an LED + resistor to
+
 int led = 10;
 
 // the setup routine runs once when you press reset:

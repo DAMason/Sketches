@@ -39,7 +39,19 @@ OneWire oneWire(ONE_WIRE_BUS);
 
 DallasTemperature sensors(&oneWire);
 
+// Buttons
 
+int GreyPin=8;
+int BluePin=7;
+int RedPin=6;
+
+bool Greypressed=false;
+bool Redpressed=false;
+bool Bluepressed=false;
+
+// Global temperature desired
+
+float TemperatureSetting=24.0;
 
 
 void setup() {
@@ -50,22 +62,22 @@ void setup() {
 
 
   // Initialize Temp Sensor
-    sensors.begin();
+  sensors.begin();
+
+
+  pinMode(GreyPin, INPUT);
+  pinMode(BluePin, INPUT);
+  pinMode(RedPin, INPUT);
+
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
+  }
 
 
   display.clearDisplay();
-
-  display.setTextSize(3);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.cp437(true);         // Use full 256 char 'Code Page 437' font
-
-  }
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
@@ -80,11 +92,26 @@ void loop() {
   sensors.requestTemperatures();
   float currentTemp=sensors.getTempCByIndex(0);
 
-  oledDisplay(currentTemp);
+  Greypressed=digitalRead(GreyPin);
+  Bluepressed=digitalRead(BluePin);
+  Redpressed=digitalRead(RedPin);
 
+  if (Bluepressed) {
+    TemperatureSetting = TemperatureSetting-0.5;
+    Bluepressed=false;
+  }
+
+  if (Redpressed) {
+    TemperatureSetting = TemperatureSetting+0.5;
+    Redpressed=false;
+  }
+
+  oledDisplay(currentTemp,TemperatureSetting);
+
+  
 
   Serial.print("Celsius temperature: ");
-  Serial.print(currentTemp);
+  Serial.print(currentTemp,TemperatureSetting);
   Serial.print("\n");
 
 
@@ -93,7 +120,7 @@ void loop() {
 
 
 
-void oledDisplay(float Temp) {
+void oledDisplay(float Temp, float WantedTemp) {
   display.clearDisplay();
 
   display.setTextSize(2);      // Normal 1:1 pixel scale
@@ -102,10 +129,12 @@ void oledDisplay(float Temp) {
   display.cp437(true);         // Use full 256 char 'Code Page 437' font
 
   display.setTextSize(1); 
-  display.println("Temperature: \n");
-  display.setTextSize(2); 
+  display.println("Temperature, Now/Set: \n");
+  display.setTextSize(1); 
   display.print(Temp);
-  display.println(" C");
+  display.print("/");
+  display.print(WantedTemp);
+  display.println("C");
   //display.write(' C');
 
   display.display();
